@@ -77,8 +77,6 @@ $focalLength.addEventListener("input", () => {
 });
 
 export async function paint() {
-  await workerMain();
-
   const start = Date.now();
   const array = render({
     aspectRatio,
@@ -99,5 +97,10 @@ export async function paint() {
   p.innerHTML = `Rendered in ${time}ms (${Math.round(1000 / time)} FPS)`;
 }
 
-updateKeys();
-paint();
+async function main() {
+  await workerMain();
+  updateKeys();
+  paint();
+}
+
+main();
