@@ -5,6 +5,7 @@
   "scripts": {
     "wasm": "wasm-pack build ./ray-tracing  --target web",
     "dev": "yarn wasm && vite",
+    "build:wasm": "yarn wasm && yarn build",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
