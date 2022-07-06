@@ -21,10 +21,17 @@
       <section class="main-body">
         <h2>How it works</h2>
         <p>
-          The raytacing is done with webassembly in Rust in a separate worker
-          thread. The data for the scene is passed between workers in a
-          <code>SharedArrayBuffer</code>, turned into an
+          Raytracing is done with WebAssembly in Rust. After creating a Vector
+          in memory corresponding to the 32 bit rgba pixel values, the wasm code
+          returns a pointer to JavaScript that gets read into an
           <code>ImageData</code> and drawn on a canvas for every frame.
+        </p>
+        <p>
+          The code is adapted for Rust + Webassembly from
+          <a
+            href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#ray"
+            >Ray Tracing in one Weekend</a
+          >.
         </p>
       </section>
       <section class="control-panel">
@@ -53,6 +60,6 @@
         </div>
       </section>
     </div>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/main.ts" crossorigin="anonymous"></script>
   </body>
 </html>

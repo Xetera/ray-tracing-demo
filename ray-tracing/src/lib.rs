@@ -3,15 +3,41 @@ mod canvas;
 mod ray;
 mod vec;
 
-use std::panic;
-
 use camera::Camera;
-use canvas::Canvas;
+use canvas::{Canvas, Pixel};
 use ray::Shape;
 use vec::{Point3, Vec3};
 use wasm_bindgen::prelude::*;
-pub use wasm_bindgen_rayon::init_thread_pool;
+// pub use wasm_bindgen_rayon::init_thread_pool;
 
+#[wasm_bindgen(js_name = sharedMemory)]
+pub fn shared_memory() -> JsValue {
+    wasm_bindgen::memory()
+}
+
+#[wasm_bindgen]
+pub struct PixelData {
+    pub offset: *const u8,
+    pub size: usize,
+}
+
+#[wasm_bindgen]
+impl PixelData {
+    pub fn new(bytes: &[u8]) -> PixelData {
+        PixelData {
+            offset: bytes.as_ptr(),
+            size: bytes.len(),
+        }
+    }
+
+    pub fn offset(&self) -> *const u8 {
+        self.offset
+    }
+
+    pub fn size(&self) -> usize {
+        self.size
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     // Use `js_namespace` here to bind `console.log(..)` instead of just
@@ -27,7 +53,7 @@ pub fn paint(
     aspect_ratio: f32,
     focal_length: f32,
     origin: Vec<f32>,
-) -> JsValue {
+) -> PixelData {
     console_error_panic_hook::set_once();
 
     let shapes = vec![
@@ -55,9 +81,9 @@ pub fn paint(
         let canvas = Canvas::new(camera, width as usize, aspect_ratio, shapes);
         let pixels = canvas.paint();
 
-        JsValue::from_serde(&pixels).unwrap()
+        PixelData::new(&pixels)
+        // JsValue::from_serde(&pixels).unwrap()
     } else {
-        JsValue::from_serde(&0).unwrap()
-        //
+        panic!("AA")
     }
 }

@@ -37,6 +37,7 @@ canvas {
 
 .control-title {
   font-size: 16px;
+  color: #2c3e50;
   margin-top: 0;
 }
 .control-panel label {
@@ -48,7 +49,10 @@ canvas {
   padding: 0 20px;
   max-width: 800px;
   margin: 40px auto;
-  color: rgb(52, 52, 52);
+}
+
+.main-body h1 {
+  color: #2c3e50;
 }
 
 code {
@@ -56,14 +60,13 @@ code {
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 0.8em;
-  display: inline;
   color: #505861;
   font-family: ui-monospace, "SF Mono", "Consolas", monospace;
 }
 
 .main-body p {
+  color: rgb(52, 52, 52);
   line-height: 180%;
-  display: inline;
   color: #505861;
 }
 
@@ -104,6 +107,6 @@ kbd {
 }
 
 .control-boundary {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
 }

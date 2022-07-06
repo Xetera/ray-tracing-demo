@@ -1,11 +1,6 @@
-import {
-  initThreadPool,
-  paint as rayPaint,
-  default as _default,
-} from "../ray-tracing/pkg/ray_tracing";
+import * as wasm from "../ray-tracing/pkg";
 
 type RenderProps = {
-  buffer: SharedArrayBuffer;
   aspectRatio: number;
   width: number;
   focalLength: number;
@@ -15,7 +10,59 @@ type RenderProps = {
   z: number;
 };
 
-function render({
+export async function main() {
+  // console.log(await WebAssembly.instantiateStreaming(fetch("/ray_tracing_bg.wasm")))
+
+  // const wasm = await instantiateStreaming(fetch("/ray_tracing_bg.wasm"))
+  // const wasm = await import("/ray_tracing_bg.wasm");
+  // const memory = new WebAssembly.Memory({ initial: 256, maximum: 256 });
+  // const importObj = {
+  //   // wbg: 1,
+  //   env: {
+  //     abortStackOverflow: () => {
+  //       throw new Error("overflow");
+  //     },
+  //     table: new WebAssembly.Table({
+  //       initial: 0,
+  //       maximum: 0,
+  //       element: "anyfunc",
+  //     }),
+  //     tableBase: 0,
+  //     memory: memory,
+  //     memoryBase: 1024,
+  //     STACKTOP: 0,
+  //     STACK_MAX: memory.buffer.byteLength,
+  //   },
+  // };
+  // console.log(wasm.default({}))
+  // console.log(importObj);
+  await wasm.default();
+  console.log("aa");
+  // await wasm.initThreadPool(navigator.hardwareConcurrency);
+  console.log("worker ready");
+  // self.onmessage = (e) => {
+  //   const { x, y, z, aspectRatio, focalLength, width, buffer } = e.data;
+  //   if (x !== undefined) {
+  //     let start = Date.now();
+  //     const result = render({
+  //       aspectRatio,
+  //       width,
+  //       focalLength,
+  //       viewportHeight: 2,
+  //       x,
+  //       y,
+  //       z,
+  //       buffer,
+  //     });
+  //     let time = Date.now() - start;
+  //     console.log(`Rendered in ${time}ms`);
+  //     self.postMessage({ result, time });
+  //   }
+  // };
+
+  // self.postMessage({ event: "ready" });
+}
+export function render({
   aspectRatio,
   width,
   focalLength,
@@ -23,10 +70,11 @@ function render({
   x,
   y,
   z,
-  buffer,
-}: RenderProps) {
-  const backing = new Uint8ClampedArray(buffer);
-  const data = rayPaint(
+}: // buffer: sharedArrayBuffer,
+RenderProps) {
+  // const backingArray = new Uint8ClampedArray(sharedArrayBuffer);
+
+  const pointer = wasm.paint(
     width,
     viewportHeight,
     aspectRatio,
@@ -34,38 +82,18 @@ function render({
     new Float32Array([x, y, z])
   );
 
-  for (let i = 0; i < data.length; i++) {
-    backing[i] = data[i];
-  }
+  return new Uint8ClampedArray(
+    wasm.sharedMemory().buffer,
+    pointer.offset(),
+    pointer.size()
+  );
 
-  return buffer;
+  // for (let i = 0; i < raw.length; i++) {
+  //   backingArray[i] = raw[i];
+  // }
+
+  // return sharedArrayBuffer;
 }
 
-async function main() {
-  await _default();
-  await initThreadPool(navigator.hardwareConcurrency);
-  console.log("worker ready");
-  self.postMessage(JSON.stringify({ event: "ready" }));
-}
-
-self.onmessage = (e) => {
-  const { x, y, z, aspectRatio, focalLength, width, buffer } = e.data;
-  if (x !== undefined) {
-    let start = Date.now();
-    const result = render({
-      aspectRatio,
-      width,
-      focalLength,
-      viewportHeight: 2,
-      x,
-      y,
-      z,
-      buffer,
-    });
-    let time = Date.now() - start;
-    console.log(`Rendered in ${time}ms`);
-    self.postMessage({ result, time });
-  }
-};
-
-main();
+//
+// main();

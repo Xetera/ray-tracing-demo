@@ -56,7 +56,7 @@ impl Canvas {
             .flat_map(|j| (0..self.width).map(move |i| (i, j)))
             .rev()
             .collect::<Vec<(usize, usize)>>()
-            .into_par_iter()
+            .into_iter()
             .map(|(i, j)| {
                 let u = i as f32 / (self.width - 1) as f32;
                 let v = j as f32 / (self.height - 1) as f32;
