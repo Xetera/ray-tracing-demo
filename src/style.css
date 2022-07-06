@@ -1,0 +1,109 @@
+body {
+  margin: 0;
+}
+
+#app {
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 40px;
+}
+
+html {
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.indicator {
+  font-weight: thin;
+  color: #4f6174;
+}
+
+canvas {
+  outline: solid 1px #eee;
+}
+
+.control-panel {
+  padding: 20px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(251, 251, 251);
+  height: 120px;
+}
+
+.control-title {
+  font-size: 16px;
+  margin-top: 0;
+}
+.control-panel label {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.main-body {
+  padding: 0 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  color: rgb(52, 52, 52);
+}
+
+code {
+  background: rgb(251, 251, 251);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  display: inline;
+  color: #505861;
+  font-family: ui-monospace, "SF Mono", "Consolas", monospace;
+}
+
+.main-body p {
+  line-height: 180%;
+  display: inline;
+  color: #505861;
+}
+
+.control-group {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 20px;
+  row-gap: 10px;
+}
+
+.control-group input {
+  max-width: 300px;
+}
+
+kbd {
+  font-family: Consolas, "Lucida Console", monospace;
+  display: inline-block;
+  border-radius: 3px;
+  padding: 0px 4px;
+  box-shadow: 1px 1px 1px #777;
+  margin: 2px;
+  font-size: small;
+  vertical-align: text-bottom;
+  background: #eee;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  font-variant: small-caps;
+  font-weight: 600;
+  /* letter-spacing: 0.5px; */
+  letter-spacing: 1px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.control-boundary {
+  max-width: 1200px;
+  margin: 0 auto;
+}

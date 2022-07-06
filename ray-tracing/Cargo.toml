@@ -1,0 +1,24 @@
+[package]
+name = "ray-tracing"
+version = "0.1.0"
+edition = "2021"
+target = "wasm32-unknown-unknown"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+debug = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rayon = "1.5.3"
+wasm-bindgen-rayon = "1.0"
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+console_error_panic_hook = { version = "0.1.1", optional = true }
+serde-wasm-bindgen = "0.4.3"
+serde = { version = "1.0", features = ["derive"] }
+
+[features]
+default = ["console_error_panic_hook"]

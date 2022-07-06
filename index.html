@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="./src/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    <div>
+      <div id="app">
+        <h1>Ray Tracing Demo</h1>
+        <p>
+          Use <kbd>w</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> to pan the
+          camera around
+        </p>
+        <canvas id="canvas">Your browser doesn't support canvas?</canvas>
+        <p class="indicator"></p>
+      </div>
+      <section class="main-body">
+        <h2>How it works</h2>
+        <p>
+          The raytacing is done with webassembly in Rust in a separate worker
+          thread. The data for the scene is passed between workers in a
+          <code>SharedArrayBuffer</code>, turned into an
+          <code>ImageData</code> and drawn on a canvas for every frame.
+        </p>
+      </section>
+      <section class="control-panel">
+        <div class="control-boundary">
+          <h2 class="control-title">Settings</h2>
+          <div class="control-group">
+            <label for="focal">Focal Length</label>
+            <input
+              type="range"
+              step="0.05"
+              min="0"
+              max="4"
+              value="4"
+              id="focal-length"
+            />
+            <label for="focal">Width</label>
+            <input
+              type="range"
+              step="4"
+              min="0"
+              max="1200"
+              value="400"
+              id="width"
+            />
+          </div>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

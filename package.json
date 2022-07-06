@@ -1,0 +1,24 @@
+{
+  "name": "ray-tracing",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "wasm": "wasm-pack build ./ray-tracing  --target web",
+    "dev": "yarn wasm && vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.182",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.9",
+    "vite-plugin-comlink": "^3.0.3",
+    "vite-plugin-cross-origin-isolation": "^0.1.6",
+    "vite-plugin-wasm": "^1.0.1",
+    "vite-plugin-wasm-pack": "^0.1.12"
+  },
+  "dependencies": {
+    "comlink": "4.3.0",
+    "lodash": "^4.17.21"
+  }
+}
