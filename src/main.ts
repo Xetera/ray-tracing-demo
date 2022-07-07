@@ -3,9 +3,10 @@ import throttle from "lodash/throttle";
 import {
   default as init,
   PixelData,
-  RelativeMovement,
+  RelativeDirection,
   Scene,
   sharedMemory,
+  Vec3,
 } from "../ray-tracing/pkg";
 
 const $focalLength = document.querySelector<HTMLInputElement>("#focal-length")!;
@@ -22,7 +23,6 @@ type Rotation = [number, number, number];
 let defaultRotation: Rotation = [0, 0, 0];
 let rotation: Rotation = defaultRotation;
 let isRotating = false;
-let ready = false;
 
 let viewportHeight = 2;
 
@@ -35,34 +35,39 @@ $movement.addEventListener("click", () => {
   isRotating = !isRotating;
   paint();
 });
-let x = 0;
-let y = 0;
-let z = 0;
 
 function changeRotation(e: MouseEvent) {
-  if (!isRotating) {
-    return;
-  }
-  const percentageX = e.clientX / window.innerWidth;
-  const percentageY = e.clientY / window.innerHeight;
-  rotation[1] = Math.PI - percentageX * Math.PI;
-  // rotation[1] = percentageY * Math.PI * 2;
+  const percentageX = e.offsetX / width;
+  const percentageY = e.offsetY / height;
+  const yExtrema = Math.PI / 3;
+  const xExtrema = Math.PI;
+  let y: number = yExtrema * (0.5 - percentageY);
+
+  let x: number = -xExtrema * (0.5 - percentageX);
+  // const y = yExtrema - (yExtrema * percentageY);
+  const array = new Float32Array([y, x, 0]);
+  scene.turn(array);
   paint();
 }
 
-document.addEventListener("mousemove", throttle(changeRotation, 50));
+$canvas.addEventListener("mouseleave", () => {
+  scene.turn(new Float32Array([0, 0, 0]));
+  paint();
+});
+
+$canvas.addEventListener("mousemove", throttle(changeRotation, 20));
 
 function updateKeys() {
   if (keys.w) {
-    scene.move_along(RelativeMovement.Forward);
+    scene.move_along(RelativeDirection.Up);
   } else if (keys.s) {
-    scene.move_along(RelativeMovement.Back);
+    scene.move_along(RelativeDirection.Down);
   }
 
   if (keys.a) {
-    scene.move_along(RelativeMovement.Left);
+    scene.move_along(RelativeDirection.Left);
   } else if (keys.d) {
-    scene.move_along(RelativeMovement.Right);
+    scene.move_along(RelativeDirection.Right);
   }
   if (Object.values(keys).some((a) => a)) {
     paint();
@@ -111,10 +116,6 @@ const changeWidthDebounced = debounce(changeWidth, 200);
 
 let dragging;
 
-$canvas.addEventListener("touchstart", (e) => {
-  console.log(e);
-});
-
 $width.addEventListener("input", () => {
   width = Number($width.value);
   height = Math.floor(width / aspectRatio);
@@ -151,7 +152,6 @@ export async function paint() {
 
 async function main() {
   await init();
-  ready = true;
   scene = Scene.new(
     width,
     viewportHeight,
@@ -161,6 +161,10 @@ async function main() {
     new Float32Array([0, 0, 0])
   );
   console.log("inited wasm");
+  // setInterval(() => {
+  //   scene.turn(RelativeDirection.Right);
+  //   paint();
+  // }, 20);
   updateKeys();
   paint();
 }

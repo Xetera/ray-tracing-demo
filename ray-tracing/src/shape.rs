@@ -39,9 +39,9 @@ struct Shapes {
 }
 
 impl Shapes {
-    fn closest(&self) -> Option<&Shape> {
-        self.data.peek()
-    }
+    // fn closest(&self) -> Option<&Shape> {
+    //     self.data.iter().find_
+    // }
 
     // fn update()
 }

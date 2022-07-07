@@ -70,6 +70,12 @@ impl Scene {
         self.camera.move_along(direction)
     }
 
+    pub fn rotate_to_pointer(&mut self, rotation: Vec<f32>) {
+        if let [x, y, z] = rotation[..] {
+            self.camera.turn(Vec3::new(x, y, z));
+        }
+    }
+
     pub fn render(&self) -> PixelData {
         let pixels = &self.canvas.paint(&self.camera);
         PixelData::new(pixels)

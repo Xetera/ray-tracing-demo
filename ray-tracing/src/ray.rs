@@ -170,6 +170,10 @@ impl Rotation3D {
                 transformer.transform(Theta(theta), &dir)
             })
     }
+
+    pub fn turn(&mut self, rotation: Vec3) {
+        self.rotation = rotation
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -205,8 +209,3 @@ pub const ROTATION_Z: AxisRotator = AxisRotator(|theta| {
         Vec3::new(0.0, 0.0, 1.0),
     ]
 });
-
-pub const ROTATION_3D: Rotation3D = Rotation3D {
-    rotation: Vec3::null(),
-    transformers: [ROTATION_Z, ROTATION_Z, ROTATION_Z],
-};

@@ -1,9 +1,7 @@
-use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::{
-    log,
-    ray::{Ray, Rotation3D, RotationTransformer},
+    ray::{Ray, Rotation3D},
     vec::{Point3, Vec3},
 };
 
@@ -16,13 +14,23 @@ pub enum RelativeDirection {
 }
 
 impl RelativeDirection {
-    fn to_vector(&self, speed: f32) -> Vec3 {
+    fn to_movement_vector(&self, speed: f32) -> Vec3 {
         match &self {
             RelativeDirection::Up => Vec3::new(0.0, 0.0, -speed),
             RelativeDirection::Down => Vec3::new(0.0, 0.0, speed),
             RelativeDirection::Left => Vec3::new(speed, 0.0, 0.0),
             RelativeDirection::Right => Vec3::new(-speed, 0.0, 0.0),
         }
+    }
+
+    fn to_rotation_vector(&self, speed: f32, rotation: Vec3) -> Vec3 {
+        rotation
+            * match &self {
+                RelativeDirection::Up => Vec3::new(speed, 0.0, 0.0),
+                RelativeDirection::Down => Vec3::new(-speed, 0.0, 0.0),
+                RelativeDirection::Left => Vec3::new(0.0, -speed, 0.0),
+                RelativeDirection::Right => Vec3::new(0.0, speed, 0.0),
+            }
     }
 }
 
@@ -60,21 +68,28 @@ impl Camera {
     }
 
     pub fn move_along(&mut self, movement: RelativeDirection) {
-        self.origin = self.origin + self.rotation.rotate(&movement.to_vector(self.speed));
+        self.origin = self.origin
+            + self
+                .rotation
+                .rotate(&movement.to_movement_vector(self.speed));
     }
 
-    pub fn turn(&mut self, direction: RelativeDirection) {}
+    pub fn turn(&mut self, rotation: Vec3) {
+        self.rotation.turn(rotation)
+    }
 
     pub fn beam(&self, u: f32, v: f32) -> Ray {
         let lower_left_corner = self.origin
             - self.horizontal / 2.0
             - self.vertical / 2.0
             - Vec3::new(0.0, 0.0, self.focal_length);
-        let direction = lower_left_corner + u * self.horizontal + v * self.vertical - self.origin;
+        let raw_direction =
+            lower_left_corner + u * self.horizontal + v * self.vertical - self.origin;
+        let direction = self.rotation.rotate(&raw_direction);
 
         Ray {
             origin: self.origin,
-            direction: direction,
+            direction,
         }
     }
 }
