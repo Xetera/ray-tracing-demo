@@ -70,6 +70,7 @@ impl Scene {
         self.camera.move_along(direction)
     }
 
+    #[wasm_bindgen(js_name = rotateToPointer)]
     pub fn rotate_to_pointer(&mut self, rotation: Vec<f32>) {
         if let [x, y, z] = rotation[..] {
             self.camera.turn(Vec3::new(x, y, z));

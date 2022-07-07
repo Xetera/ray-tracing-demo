@@ -6,35 +6,19 @@ import {
   RelativeDirection,
   Scene,
   sharedMemory,
-  Vec3,
 } from "../ray-tracing/pkg";
 
 const $focalLength = document.querySelector<HTMLInputElement>("#focal-length")!;
 const $width = document.querySelector<HTMLInputElement>("#width")!;
 const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
-const $movement =
-  document.querySelector<HTMLButtonElement>("#movement-toggle")!;
 
 const aspectRatio = 16.0 / 9.0;
 let width = Number($width.value);
 let height = width / aspectRatio;
 
-type Rotation = [number, number, number];
-let defaultRotation: Rotation = [0, 0, 0];
-let rotation: Rotation = defaultRotation;
-let isRotating = false;
-
 let viewportHeight = 2;
 
 let scene: Scene;
-
-$movement.addEventListener("click", () => {
-  if (isRotating) {
-    rotation = defaultRotation;
-  }
-  isRotating = !isRotating;
-  paint();
-});
 
 function changeRotation(e: MouseEvent) {
   const percentageX = e.offsetX / width;
@@ -46,12 +30,12 @@ function changeRotation(e: MouseEvent) {
   let x: number = -xExtrema * (0.5 - percentageX);
   // const y = yExtrema - (yExtrema * percentageY);
   const array = new Float32Array([y, x, 0]);
-  scene.turn(array);
+  scene.rotateToPointer(array);
   paint();
 }
 
 $canvas.addEventListener("mouseleave", () => {
-  scene.turn(new Float32Array([0, 0, 0]));
+  scene.rotateToPointer(new Float32Array([0, 0, 0]));
   paint();
 });
 
@@ -113,8 +97,6 @@ function changeWidth(width: number, height: number) {
 // }, 16);
 
 const changeWidthDebounced = debounce(changeWidth, 200);
-
-let dragging;
 
 $width.addEventListener("input", () => {
   width = Number($width.value);
