@@ -31,7 +31,9 @@ function changeRotation(e: MouseEvent) {
   // const y = yExtrema - (yExtrema * percentageY);
   const array = new Float32Array([y, x, 0]);
   scene.rotateToPointer(array);
-  paint();
+  if (!isMoving()) {
+    paint();
+  }
 }
 
 $canvas.addEventListener("mouseleave", () => {
@@ -53,7 +55,7 @@ function updateKeys() {
   } else if (keys.d) {
     scene.move_along(RelativeDirection.Right);
   }
-  if (Object.values(keys).some((a) => a)) {
+  if (isMoving()) {
     paint();
   }
   requestAnimationFrame(updateKeys);
@@ -70,6 +72,8 @@ const keys = {
   s: false,
   d: false,
 };
+
+const isMoving = () => Object.values(keys).some((val) => Boolean(val));
 
 document.addEventListener("keydown", (event) => {
   if (event.key in keys) {
