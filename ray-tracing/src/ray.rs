@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::{
     log,
+    shape::Shape,
     vec::{Color3, Point3, Vec3},
 };
 
@@ -13,26 +15,6 @@ pub struct Ray {
 impl Ray {
     pub fn at(&self, t: f32) -> Vec3 {
         self.origin + self.direction * t
-    }
-}
-
-#[derive(Copy, Clone, Serialize, Deserialize)]
-pub enum Shape {
-    Sphere {
-        center: Point3,
-        radius: f32,
-        color: Color3,
-    },
-}
-
-impl Shape {
-    pub fn color(&self, ray: &Ray) -> Color3 {
-        match self {
-            Shape::Sphere { color, center, .. } => {
-                let coeff = 1.0 - ((ray.origin + ray.direction) - *center).length();
-                *color * coeff
-            }
-        }
     }
 }
 
@@ -139,3 +121,92 @@ impl ToString for Ray {
         )
     }
 }
+
+#[derive(Copy, Clone, Serialize, Deserialize)]
+pub struct Theta(f32);
+
+impl Theta {
+    fn from_radians(radians: f32) -> Option<Self> {
+        if radians < 0.0 || radians > std::f32::consts::TAU {
+            None
+        } else {
+            Some(Self(radians))
+        }
+    }
+    fn cos(&self) -> f32 {
+        self.0.cos()
+    }
+
+    fn sin(&self) -> f32 {
+        self.0.sin()
+    }
+}
+
+pub trait RotationTransformer {
+    fn transform(&self, theta: Theta, direction: &Vec3) -> Vec3;
+}
+
+#[derive(Copy, Clone)]
+pub struct Rotation3D {
+    rotation: Vec3,
+    transformers: [AxisRotator; 3],
+}
+
+impl Rotation3D {
+    pub fn new(rotation: Vec3) -> Self {
+        let transformers = [ROTATION_X, ROTATION_Y, ROTATION_Z];
+
+        Self {
+            rotation,
+            transformers,
+        }
+    }
+
+    pub fn rotate(&self, direction: &Vec3) -> Vec3 {
+        self.transformers
+            .iter()
+            .zip(self.rotation.parts())
+            .fold(*direction, |dir, (transformer, theta)| {
+                transformer.transform(Theta(theta), &dir)
+            })
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct AxisRotator(fn(f32) -> [Vec3; 3]);
+
+impl RotationTransformer for AxisRotator {
+    fn transform(&self, theta: Theta, direction: &Vec3) -> Vec3 {
+        let vecs = self.0(theta.0);
+        Vec3::from_array(vecs.map(|vec| direction.dot(vec)))
+    }
+}
+
+pub const ROTATION_X: AxisRotator = AxisRotator(|theta| {
+    [
+        Vec3::new(1.0, 0.0, 0.0),
+        Vec3::new(0.0, theta.cos(), -theta.sin()),
+        Vec3::new(0.0, theta.sin(), theta.cos()),
+    ]
+});
+
+pub const ROTATION_Y: AxisRotator = AxisRotator(|theta| {
+    [
+        Vec3::new(theta.cos(), 0.0, theta.sin()),
+        Vec3::new(0.0, 1.0, 0.0),
+        Vec3::new(-theta.sin(), 0.0, theta.cos()),
+    ]
+});
+
+pub const ROTATION_Z: AxisRotator = AxisRotator(|theta| {
+    [
+        Vec3::new(theta.cos(), -theta.sin(), 0.0),
+        Vec3::new(theta.sin(), theta.cos(), 0.0),
+        Vec3::new(0.0, 0.0, 1.0),
+    ]
+});
+
+pub const ROTATION_3D: Rotation3D = Rotation3D {
+    rotation: Vec3::null(),
+    transformers: [ROTATION_Z, ROTATION_Z, ROTATION_Z],
+};

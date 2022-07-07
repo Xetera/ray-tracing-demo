@@ -1,9 +1,11 @@
 use std::ops;
 
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::canvas::{Drawable, Pixel};
 
+#[wasm_bindgen]
 #[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Vec3 {
     data: [f32; 3],
@@ -18,7 +20,7 @@ impl Vec3 {
         Self { data: arr }
     }
 
-    pub fn null() -> Self {
+    pub const fn null() -> Self {
         Self {
             data: [0f32, 0f32, 0f32],
         }
@@ -41,6 +43,10 @@ impl Vec3 {
         self.data.iter().zip(vec.data).map(|(a, b)| a * b).sum()
     }
 
+    pub fn parts(&self) -> [f32; 3] {
+        self.data
+    }
+
     #[inline]
     pub fn cross(&self, vec: Vec3) -> Self {
         Self::new(
@@ -59,8 +65,16 @@ impl Vec3 {
         self.data.iter().map(|a| a * a).sum()
     }
 
+    pub fn sum(&self) -> f32 {
+        self.data.iter().sum()
+    }
+
     pub fn length(&self) -> f32 {
         f32::sqrt(self.length_squared())
+    }
+
+    pub fn map(&self, f: fn(f32) -> f32) -> Vec3 {
+        Self::from_array(self.parts().map(f))
     }
 }
 
