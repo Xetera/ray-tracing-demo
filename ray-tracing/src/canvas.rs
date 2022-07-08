@@ -1,4 +1,8 @@
+use std::cell::RefCell;
+
+use rand::prelude::*;
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::shape::Shape;
 use crate::{
@@ -20,26 +24,43 @@ pub struct ImageData {
     pub width: i32,
 }
 
+#[wasm_bindgen]
+pub struct AntiAliasing(pub u8);
+
 // #[derive(Serialize, Deserialize)]
 pub struct Canvas {
     width: usize,
     height: usize,
     aspect_ratio: f32,
+    anti_aliasing: AntiAliasing,
     shapes: Vec<Shape>,
     pixels: Vec<(usize, usize)>,
+    rng: RefCell<ThreadRng>,
 }
 
 impl Canvas {
-    pub fn new(width: usize, aspect_ratio: f32, shapes: Vec<Shape>) -> Self {
+    pub fn new(
+        width: usize,
+        aspect_ratio: f32,
+        shapes: Vec<Shape>,
+        anti_aliasing: AntiAliasing,
+    ) -> Self {
         let (width, height) = Canvas::dimensions(width, aspect_ratio);
+        let rng = RefCell::new(rand::thread_rng());
 
         Self {
             width,
             aspect_ratio,
             height,
+            anti_aliasing,
+            rng,
             shapes,
             pixels: Canvas::pixel_vec(width, height),
         }
+    }
+
+    pub fn set_aa(&mut self, aa: u8) {
+        self.anti_aliasing = AntiAliasing(aa)
     }
 
     pub fn dimensions(width: usize, aspect_ratio: f32) -> (usize, usize) {
@@ -64,12 +85,26 @@ impl Canvas {
             .pixels
             .iter()
             .map(|(i, j)| {
-                let u = *i as f32 / (self.width - 1) as f32;
-                let v = *j as f32 / (self.height - 1) as f32;
+                let samples = self.anti_aliasing.0;
+                // sadly there's no mconcat in rust :'(
+                let u = (*i as f32) / (self.width - 1) as f32;
+                let v = (*j as f32) / (self.height - 1) as f32;
 
-                let ray = camera.beam(u, v);
+                let base_color = self.color_at(&camera.beam(u, v));
+                if samples != 0 {
+                    let added_color = (0..samples).fold(base_color, |color, _| {
+                        let variation: f32 = self.rng.borrow_mut().gen();
+                        let u = (*i as f32 + variation) / (self.width - 1) as f32;
+                        let v = (*j as f32 + variation) / (self.height - 1) as f32;
+                        let ray = camera.beam(u, v);
+                        color + self.color_at(&ray)
+                    });
 
-                self.color_at(&ray)
+                    let scale = 1.0 / (samples + 1) as f32;
+                    added_color * scale
+                } else {
+                    base_color
+                }
             })
             .collect::<Vec<Vec3>>();
 

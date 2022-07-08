@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::{
     camera::{Camera, RelativeDirection},
-    canvas::Canvas,
+    canvas::{AntiAliasing, Canvas},
     shape::Shape,
     vec::{Point3, Vec3},
     PixelData,
@@ -23,6 +23,7 @@ impl Scene {
         focal_length: f32,
         origin: Vec<f32>,
         rotation: Vec<f32>,
+        aa: u8,
     ) -> Self {
         console_error_panic_hook::set_once();
 
@@ -55,15 +56,11 @@ impl Scene {
                     origin,
                     rotation,
                 );
-                let canvas = Canvas::new(width as usize, aspect_ratio, shapes);
+                let canvas = Canvas::new(width as usize, aspect_ratio, shapes, AntiAliasing(aa));
                 return Self { camera, canvas };
-                // let pixels = canvas.paint();
-
-                // return PixelData::new(&pixels);
-                // JsValue::from_serde(&pixels).unwrap()
             }
         }
-        panic!("AA")
+        panic!("Huh?")
     }
 
     pub fn move_along(&mut self, direction: RelativeDirection) {
@@ -83,6 +80,10 @@ impl Scene {
 
     pub fn down(&mut self) {
         self.camera.down()
+    }
+
+    pub fn set_aa(&mut self, aa: u8) {
+        self.canvas.set_aa(aa)
     }
 
     pub fn render(&self) -> PixelData {

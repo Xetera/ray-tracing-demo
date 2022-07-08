@@ -22,16 +22,6 @@ impl RelativeDirection {
             RelativeDirection::Right => Vec3::new(-speed, 0.0, 0.0),
         }
     }
-
-    fn to_rotation_vector(&self, speed: f32, rotation: Vec3) -> Vec3 {
-        rotation
-            * match &self {
-                RelativeDirection::Up => Vec3::new(speed, 0.0, 0.0),
-                RelativeDirection::Down => Vec3::new(-speed, 0.0, 0.0),
-                RelativeDirection::Left => Vec3::new(0.0, -speed, 0.0),
-                RelativeDirection::Right => Vec3::new(0.0, speed, 0.0),
-            }
-    }
 }
 
 #[derive(Copy, Clone)]

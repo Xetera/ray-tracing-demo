@@ -11,14 +11,18 @@
     <div>
       <div id="app">
         <h1>Ray Tracing Demo</h1>
-        <p>
-          Use <kbd>w</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> to pan the
-          camera around
-        </p>
         <canvas id="canvas">Your browser doesn't support canvas?</canvas>
         <p class="indicator"></p>
       </div>
-      <section class="main-body">
+      <section class="centered instructions">
+        <p>
+          Use <kbd>w</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> to pan the
+          camera
+        </p>
+        <p>Move your mouse on the camera to look around</p>
+        <p><kbd>Space</kbd> to fly up, <kbd>Shift</kbd> to descend</p>
+      </section>
+      <section class="centered main-body">
         <h2>How it works</h2>
         <p>
           Raytracing is done with WebAssembly in Rust. After creating a Vector
@@ -55,6 +59,15 @@
               max="1200"
               value="400"
               id="width"
+            />
+            <label for="focal">Anti Aliasing</label>
+            <input
+              type="range"
+              step="1"
+              min="0"
+              max="10"
+              value="0"
+              id="anti-aliasing"
             />
           </div>
         </div>

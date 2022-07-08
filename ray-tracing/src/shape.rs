@@ -1,6 +1,3 @@
-use std::cmp::Reverse;
-use std::collections::BinaryHeap;
-
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -32,16 +29,4 @@ impl Shape {
             Shape::Sphere { center, .. } => (*center - *origin).map(|x| x.powi(2)).sum(),
         }
     }
-}
-
-struct Shapes {
-    data: BinaryHeap<Shape>,
-}
-
-impl Shapes {
-    // fn closest(&self) -> Option<&Shape> {
-    //     self.data.iter().find_
-    // }
-
-    // fn update()
 }

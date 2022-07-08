@@ -1,11 +1,6 @@
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::{
-    log,
-    shape::Shape,
-    vec::{Color3, Point3, Vec3},
-};
+use crate::{shape::Shape, vec::Vec3};
 
 pub struct Ray {
     pub origin: Vec3,
@@ -36,14 +31,6 @@ pub enum CastResult {
 }
 
 impl CastResult {
-    pub fn hit_count(&self) -> usize {
-        match self {
-            CastResult::Miss => 0,
-            // a hit is guaranteed 1 hit + the next collisions
-            CastResult::Hit(CastHit { collisions, .. }) => 1 + collisions.len(),
-        }
-    }
-
     pub fn hit(self) -> Option<CastHit> {
         match self {
             CastResult::Hit(hit) => Some(hit),
@@ -124,23 +111,6 @@ impl ToString for Ray {
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct Theta(f32);
-
-impl Theta {
-    fn from_radians(radians: f32) -> Option<Self> {
-        if radians < 0.0 || radians > std::f32::consts::TAU {
-            None
-        } else {
-            Some(Self(radians))
-        }
-    }
-    fn cos(&self) -> f32 {
-        self.0.cos()
-    }
-
-    fn sin(&self) -> f32 {
-        self.0.sin()
-    }
-}
 
 pub trait RotationTransformer {
     fn transform(&self, theta: Theta, direction: &Vec3) -> Vec3;

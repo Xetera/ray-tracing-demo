@@ -11,6 +11,8 @@ import {
 const $focalLength = document.querySelector<HTMLInputElement>("#focal-length")!;
 const $width = document.querySelector<HTMLInputElement>("#width")!;
 const $canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
+const $antiAliasing =
+  document.querySelector<HTMLInputElement>("#anti-aliasing")!;
 
 const aspectRatio = 16.0 / 9.0;
 let width = Number($width.value);
@@ -24,11 +26,10 @@ function changeRotation(e: MouseEvent) {
   const percentageX = e.offsetX / width;
   const percentageY = e.offsetY / height;
   const yExtrema = Math.PI / 2;
-  const xExtrema = Math.PI;
+  const xExtrema = Math.PI * 2;
   let y: number = yExtrema * (0.5 - percentageY);
 
   let x: number = -xExtrema * (0.5 - percentageX);
-  // const y = yExtrema - (yExtrema * percentageY);
   const array = new Float32Array([y, x, 0]);
   scene.rotateToPointer(array);
   if (!isMoving()) {
@@ -104,11 +105,6 @@ function changeWidth(width: number, height: number) {
   paint();
 }
 
-// setInterval(() => {
-//   rotation = (rotation + Math.PI / 64) % (Math.PI * 2);
-//   paint();
-// }, 16);
-
 const changeWidthDebounced = debounce(changeWidth, 200);
 
 $width.addEventListener("input", () => {
@@ -117,6 +113,13 @@ $width.addEventListener("input", () => {
   $canvas.width = width;
   $canvas.height = height;
   changeWidthDebounced(width, height);
+});
+
+$antiAliasing.addEventListener("input", () => {
+  const aa = Number($antiAliasing.value);
+  console.log(aa);
+  scene.set_aa(aa);
+  paint();
 });
 
 $focalLength.addEventListener("input", () => {
@@ -142,7 +145,10 @@ export async function paint() {
   let time = end - start;
   const p = document.querySelector<HTMLDivElement>(".indicator")!;
   ctx.putImageData(imageData, 0, 0);
-  p.innerHTML = `Rendered in ${time}ms (${Math.round(1000 / time)} FPS)`;
+  let fps = 1000 / time;
+  p.innerHTML = `Rendered in ${time}ms (${
+    fps > 1 ? Math.round(fps) : fps.toFixed(2)
+  } FPS)`;
 }
 
 async function main() {
@@ -153,7 +159,8 @@ async function main() {
     aspectRatio,
     Number($focalLength.value),
     new Float32Array([0, 0, 3]),
-    new Float32Array([0, 0, 0])
+    new Float32Array([0, 0, 0]),
+    Number($antiAliasing.value)
   );
   console.log("inited wasm");
   // setInterval(() => {
