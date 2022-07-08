@@ -23,7 +23,7 @@ let scene: Scene;
 function changeRotation(e: MouseEvent) {
   const percentageX = e.offsetX / width;
   const percentageY = e.offsetY / height;
-  const yExtrema = Math.PI / 3;
+  const yExtrema = Math.PI / 2;
   const xExtrema = Math.PI;
   let y: number = yExtrema * (0.5 - percentageY);
 
@@ -55,6 +55,13 @@ function updateKeys() {
   } else if (keys.d) {
     scene.move_along(RelativeDirection.Right);
   }
+
+  if (keys[" "]) {
+    scene.up();
+  } else if (keys.Shift) {
+    scene.down();
+  }
+
   if (isMoving()) {
     paint();
   }
@@ -71,6 +78,8 @@ const keys = {
   a: false,
   s: false,
   d: false,
+  " ": false,
+  Shift: false,
 };
 
 const isMoving = () => Object.values(keys).some((val) => Boolean(val));

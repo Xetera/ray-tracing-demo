@@ -77,6 +77,14 @@ impl Scene {
         }
     }
 
+    pub fn up(&mut self) {
+        self.camera.up()
+    }
+
+    pub fn down(&mut self) {
+        self.camera.down()
+    }
+
     pub fn render(&self) -> PixelData {
         let pixels = &self.canvas.paint(&self.camera);
         PixelData::new(pixels)

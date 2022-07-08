@@ -78,13 +78,23 @@ impl Camera {
         self.rotation.turn(rotation)
     }
 
+    pub fn up(&mut self) {
+        self.origin = self.origin + Vec3::new(0.0, self.speed, 0.0)
+    }
+
+    pub fn down(&mut self) {
+        self.origin = self.origin + Vec3::new(0.0, -self.speed, 0.0)
+    }
+
     pub fn beam(&self, u: f32, v: f32) -> Ray {
         let lower_left_corner = self.origin
             - self.horizontal / 2.0
             - self.vertical / 2.0
             - Vec3::new(0.0, 0.0, self.focal_length);
+
         let raw_direction =
             lower_left_corner + u * self.horizontal + v * self.vertical - self.origin;
+
         let direction = self.rotation.rotate(&raw_direction);
 
         Ray {
